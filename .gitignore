@@ -1,0 +1,48 @@
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# Secrets
+.env
+.env.*
+
+# R
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+renv/library/
+renv/staging/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*~
+
+# Raw / intermediate data
+data/raw/*
+!data/raw/README.md
+!data/raw/.gitkeep
+data/intermediate/
+
+# Reference PDFs if you store them locally
+references/
