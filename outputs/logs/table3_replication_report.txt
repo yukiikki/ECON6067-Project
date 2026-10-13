@@ -1,0 +1,66 @@
+TABLE III REPLICATION REPORT
+
+STATUS
+Completed the modern-sample replication of Jegadeesh and Titman (1993) Table III.
+Strategy: J=6, K=6, no skip week. Evaluation period: 200201-202512 (288 months).
+
+PAPER-STATED METHOD
+The paper forms momentum portfolios within small/medium/large size subsamples and within low/medium/high ex-ante beta subsamples. Ex-ante betas are Scholes-Williams betas estimated from daily returns in the calendar year before portfolio formation. Panel A reports mean monthly returns. Panel B reports CAPM alphas from portfolio excess returns regressed on the CRSP value-weighted market excess return. Panel A jointly tests equality of P1-P10 means; Panel B jointly tests that P1-P10 alphas equal zero.
+
+IMPLEMENTATION ASSUMPTIONS REQUIRING REVIEW
+1. Size is measured by end-of-formation-month MthCap. Eligible stocks are split into near-equal terciles using ascending PERMNO for exact ties, then ranked into momentum deciles within each tercile.
+2. Scholes-Williams beta is (beta_lag + beta_current + beta_lead)/(1 + 2*rho_market). It uses raw daily total returns, requires at least 100 usable observations for every component, and is neither trimmed nor winsorized. Market lead/lag dates immediately outside a calendar-year boundary may enter the corresponding edge observation.
+3. Stocks without an eligible prior-calendar-year beta are excluded only from beta-sorted subsamples. They remain in All and size portfolios.
+4. Panel A uses conventional time-series t-statistics and a Hotelling finite-sample F test for equality of ten means. Panel B uses conventional OLS alpha t-statistics and the Gibbons-Ross-Shanken F test. The paper identifies the nulls but does not state these exact finite-sample formulas.
+5. Exact momentum, size, and beta ties are broken by ascending PERMNO. The paper does not state tie rules.
+
+WML RESULTS
+Group  Panel A mean (t)     Panel B alpha (t)
+  All    0.6591% (  1.506)    1.1176% (  2.719)
+   S1    0.9565% (  1.668)    1.5011% (  2.746)
+   S2    0.5829% (  1.393)    0.9724% (  2.432)
+   S3    0.3165% (  0.978)    0.5919% (  1.895)
+   B1    0.3797% (  1.050)    0.6643% (  1.889)
+   B2    0.4154% (  1.150)    0.7495% (  2.169)
+   B3    1.2234% (  2.073)    1.7673% (  3.129)
+
+JOINT TESTS
+Group  Panel A F (p)       Panel B GRS F (p)
+  All    1.4743 (0.1571)    2.4496 (0.0081)
+   S1    0.8056 (0.6114)    2.5202 (0.0065)
+   S2    1.6293 (0.1066)    2.1597 (0.0205)
+   S3    0.8797 (0.5438)    1.6914 (0.0824)
+   B1    2.6569 (0.0057)    4.1812 (0.0000)
+   B2    1.5124 (0.1431)    1.9460 (0.0393)
+   B3    2.4582 (0.0104)    2.4879 (0.0072)
+
+DATA AND COVERAGE
+Stage 2 panel: 520,438 rows, 4,669 stocks, 312 months; unique keys confirmed.
+Unfiltered holding-return lookup: 612,239 stock-months.
+Daily market cache: 6,289 trading days, 2000-01-03 to 2024-12-31; validated and reused.
+Annual Scholes-Williams estimates: 48,848 stock-years, 4,515 stocks, years 2000-2024.
+Annual beta range: -19.7012 to 13.0349; formation-assignment distribution p1/median/p99: -0.2982/1.0328/3.3388. Extreme estimates are retained.
+Valid momentum stock-formations: 498,789; missing six-month history: 20,505; unusable formation return: 1,144.
+Beta-subsample exclusions for unavailable eligible prior-year beta: 9,051 stock-formations. Size-subsample exclusions for unavailable/nonpositive cap: 0.
+Holding-component exclusions under the existing Table I convention: 117,582; missing returns were not set to zero and complete delisting returns were retained.
+
+VALIDATION
+PASS - synthetic tercile, Scholes-Williams, OLS, matrix, and F-distribution checks.
+PASS - prior-calendar-year betas are used; no formation or holding decision uses future stock returns.
+PASS - size and beta terciles are exhaustive among stocks with usable sorting characteristics and differ in size by at most one.
+PASS - momentum deciles within every subsample are mutually exclusive, ordered, and balanced.
+PASS - every monthly portfolio has six active cohorts, equal weighting within cohort-deciles, and equal weighting across cohorts.
+PASS - All P1-P10 monthly returns reproduce Table II; maximum absolute difference 0.000e+00.
+PASS - WML return and alpha identities, CAPM factor units, joint-test dimensions, and the 288-month evaluation period were validated.
+PASS - repeated single-thread beta estimation produced bitwise-identical beta and final CSV outputs.
+PASS - raw data, prepared data, and existing Table I/II results were unchanged.
+
+INTERPRETATION LIMITS
+The modern 2000-2025 sample is not expected to reproduce the paper's 1965-1989 estimates. Beta availability and the 100-day rule change the beta-sorted universe and should be approved before Table III is treated as methodologically final. Conventional t-statistics do not adjust for residual serial dependence from overlapping portfolios.
+
+OUTPUTS
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/table3_replication.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/table3_monthly_portfolios.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/logs/table3_replication_report.txt
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/processed/table3_scholes_williams_betas.parquet
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/processed/table3_daily_market.parquet
