@@ -1,0 +1,4 @@
+panel,formation_months_J,holding_months_K,portfolio,mean_monthly_return,mean_monthly_return_percent,standard_error,t_statistic,n_months
+A: no skip,6,6,P1,0.0117444653,1.174447,0.0065009353,1.8066,301
+A: no skip,6,6,P10,0.0135390637,1.353906,0.0038250716,3.5396,301
+A: no skip,6,6,WML (P10-P1),0.0017945984,0.179460,0.0046798929,0.3835,301

@@ -1,0 +1,70 @@
+STAGE 2 SAMPLE-CONSTRUCTION REPORT
+
+STATUS
+Completed and validated. No momentum portfolios were constructed.
+Raw input: /Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/02_Monthly_Stocks_and_Factors/data/monthly_stock.csv
+Processed output: /Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/processed/monthly_stock_prepared.parquet
+Raw SHA-256: 7ddf7d1ee80945a667111d84b0cb70c92798ae9c3c68118e2316bfdd14dd1cc8
+Raw file unchanged during processing: yes
+
+SAMPLE WATERFALL
+Raw rows: 2,423,212
+Unique stock-months after duplicate resolution: 2,393,591
+Excluded other exchanges: 1,441,471
+NYSE/NYSE American stock-months: 952,120
+Excluded non-common-stock classifications: 431,682
+Final processed stock-months: 520,438
+
+DUPLICATE RESOLUTION
+Duplicate groups: 22,447
+Excess source rows: 29,621
+Distribution-only groups: 20,905
+Historical-classification conflicts: 1,542
+Resolved uniquely by effective date: 1,542
+Eligibility-changing conflicts: 350
+Core monthly conflicts: 0
+Ambiguous histories: 0
+Unexpected key/non-distribution conflicts: 0
+
+PRESERVED DATA AND USABILITY FLAGS
+Missing returns preserved: 187
+Missing capitalization preserved: 88
+Returns below -100%: 0
+Returns above +500% preserved: 19
+Nonpositive capitalization: 0
+return_available: nonmissing simple return >= -1.
+return_usable: return_available and MthDelFlg not in {G, M}.
+cap_available: nonmissing; cap_usable: nonmissing and > 0.
+No values were imputed, trimmed, or winsorized.
+
+DELISTING AND RETURN FLAGS
+MthDelFlg: A=298, G=1, M=5, N=520,087, P=45, V=2
+MthRetFlg: CR=517,590, DE=350, GP=205, IP=70, MP=279, NS=1,757, NT=187
+A/P/V already include delisting returns; G/M are retained but marked incomplete.
+
+TRADING STATUS
+RW/A=520,313, RW/H=120, RW/S=5
+No trading-status exclusion was applied.
+
+DATE CONVENTIONS
+yyyymm is the integer source month key.
+month is the first calendar day for stable monthly joins.
+mth_cal_dt retains the actual CRSP month-end trading date.
+Classification is selected on MthPrcDt, falling back to MthCalDt.
+
+VALIDATION
+Rows: 520,438 (expected 520,438)
+Distinct PERMNOs: 4,669 (expected 4,669)
+Distinct months: 312 (expected 312)
+Duplicate PERMNO-month keys: 0
+Columns: 34
+Parquet row groups: 11
+Monthly stock-count range: 1,367 to 2,311
+
+ASSUMPTIONS AND LIMITATIONS
+The modern 2000-2025 sample cannot reproduce the paper's 1965-1989 period.
+The common-stock rule maps CIZ fields to legacy CRSP share codes 10/11.
+Distribution rows are collapsed because MthRet already aggregates distributions.
+Six G/M delisting observations need an explicit portfolio-stage decision.
+The daily file still needs full preparation for skip-week and beta analyses.
+Formation/holding eligibility will be determined dynamically later.

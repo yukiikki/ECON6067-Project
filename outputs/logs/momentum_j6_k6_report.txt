@@ -1,0 +1,64 @@
+STAGE 3 MOMENTUM REPORT: TABLE I, PANEL A, J=6, K=6
+
+STATUS
+Completed and validated. Only the no-skip 6/6 strategy was constructed.
+Prepared Parquet readable by Python: yes (11 row groups, ZSTD supported)
+Prepared SHA-256: fa22a4dc1dc329d0aff7e2efdd183ef01aa459e4370b611e4117632f3b6fca8f
+Raw CSV unchanged during Stage 3: yes
+Prepared Parquet unchanged during Stage 3: yes
+
+STAGE 2 INPUT VALIDATION
+Rows: 520,438 (expected 520,438)
+Distinct PERMNOs: 4,669 (expected 4,669)
+Distinct months: 312 (expected 312)
+Duplicate PERMNO-month keys: 0
+Month range: 200001-202512
+
+PORTFOLIO TIMING AND ELIGIBILITY
+Formation month t uses exactly t-5 through t; holding begins in t+1.
+All six formation months must exist and have return_usable=True.
+Valid stock-formation signals: 496,775
+Rejected nonconsecutive six-row windows: 323
+Rejected six-month windows containing an unusable return: 319
+Formation months ranked: 307
+Eligible stocks per formation month: 1,333 to 2,172
+Decile sizes across formations: 133 to 218
+Exact signal-tie groups: 1; tied stock-formations: 2
+
+MONTHLY STRATEGY SERIES
+Full six-cohort months: 301
+Return period: 200012-202512
+P1 usable constituent slots: 278,232/292,792
+P10 usable constituent slots: 278,630/291,148
+Unique selected stock-months with an unusable/absent return: 11,102
+Unique selected stock-months absent from the prepared panel: 11,043
+  after the stock's final prepared row: 10,811 pairs across 2,155 stocks
+  gaps inside the stock's prepared-data span: 232 pairs
+Final prepared-row delisting flags for those 2,155 stocks: A=167, M=5, N=1,944, P=38, V=1
+P1 exclusions by reason: incomplete_delisting_M=18, missing_return=161, no_stock_month_record=14,381
+P10 exclusions by reason: missing_return=27, no_stock_month_record=12,491
+
+RESULTS (MONTHLY PERCENT)
+P1 losers: mean=1.1744, t=1.8066
+P10 winners: mean=1.3539, t=3.5396
+WML (P10-P1): mean=0.1795, t=0.3835
+Standard errors are conventional time-series standard errors: sample SD (ddof=1) / sqrt(T).
+No autocorrelation or heteroskedasticity correction is applied in this paper-style table.
+
+VALIDATION CHECKS
+Synthetic tests passed: six-month compounding and no-look-ahead; consecutive usable formation history; deterministic equal-size decile ranking; missing holding returns excluded rather than set to zero; six-cohort overlap and WML arithmetic.
+Actual-data checks passed: Stage 2 dimensions/schema; unique keys; standardized and consecutive calendar months; exact six-month signal windows; one decile per eligible stock; decile sizes differ by at most one; P1 signals do not exceed P10 signals; holding begins after formation; exactly six cohorts per reported month; equal weighting; WML=P10-P1.
+
+IMPLEMENTATION ASSUMPTIONS AND UNRESOLVED ISSUES
+The paper states equal-weight deciles, overlapping cohorts, and monthly rebalancing but does not specify an exact-tie rule. Exact signal ties are split deterministically by ascending PERMNO.
+A cohort retains its original membership. In a holding month, its leg is rebalanced equally across members with return_usable=True. Missing returns and incomplete G/M delisting returns are omitted and the remaining weights are renormalized; no zero is inserted and no stock is excluded using future information.
+Stage 2 already includes complete A/P/V delisting returns. The six G/M observations remain unusable because their delisting return is incomplete. The selected-portfolio impact is counted above. Alternative delisting-return imputation requires a separately justified robustness analysis.
+An absent prepared stock-month can mean a true security exit or that its exchange/security classification no longer passes the monthly Stage 2 filter. The prepared panel alone cannot distinguish every case. Before treating the 6/6 estimates as final, verify whether holding returns should be drawn from an unfiltered return lookup after eligibility is fixed at formation; this could reduce the no-record omissions without imposing a future-survival rule.
+The reported series begins only when all six overlapping cohorts are present, so the start-up months are excluded.
+The modern 2000-2025 data are a sample-period deviation from the paper's 1965-1989 analysis; numerical equality with the original table is not expected.
+Conventional t-statistics match the stated table convention used here, but overlapping strategies can create serial dependence. A HAC robustness statistic should be considered later and clearly separated from the replication statistic.
+
+OUTPUTS
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/table1_panel_a_j6_k6.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/table1_panel_a_j6_k6_monthly.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/logs/momentum_j6_k6_report.txt
