@@ -1,0 +1,68 @@
+TABLE I REPLICATION REPORT
+
+STATUS
+Completed all 32 strategies: Panels A/B and J,K in 3,6,9,12.
+Only Table I was implemented. Tables II and III were not started.
+Modern evaluation period: 200201-202512 (288 common months)
+Original-paper evaluation period: 196501-198912.
+
+INPUT VALIDATION
+Stage 2 rows/stocks/months: 520,438 / 4,669 / 312; unique keys confirmed.
+Prepared Parquet readable with Python; SHA-256: fa22a4dc1dc329d0aff7e2efdd183ef01aa459e4370b611e4117632f3b6fca8f
+Unfiltered monthly lookup: 612,239 stock-months, 2,252 duplicate excess rows resolved with no return/flag conflicts.
+Daily relevant universe: 12,786,176 stock-days, 12,538,450 nonmissing returns, 1,302 duplicate excess rows resolved with no return/flag conflicts.
+Daily return range preserved: -0.999286 to 16.928571.
+All raw and prepared inputs unchanged during execution: yes.
+
+METHOD
+Formation-date eligibility comes from the Stage 2 NYSE/NYSE American common-stock panel.
+Panel A ranks the compounded unfiltered monthly returns over t-J+1 through t and begins holding in t+1.
+Panel B forms at the same monthly dates, but measures an exact J-calendar-month daily-return window ending one week before the first trading day of t+1.
+All strategies use deterministic ascending-PERMNO tie breaks, equal-weight deciles, monthly rebalancing within cohorts, and equal weighting across K overlapping cohorts.
+The common evaluation start is chosen only after every one of the 32 strategies has all required overlapping cohorts.
+
+ONE-WEEK IMPLEMENTATION ASSUMPTION
+The paper does not specify whether one week means five trading days or seven calendar days. This implementation uses seven calendar days: the signal endpoint is the latest market trading date on or before formation date minus seven days. The J-month daily window starts immediately after the latest market date on or before that endpoint minus J calendar months.
+Panel B requires a stock record at both market-date boundaries. Missing daily return fields inside the interval are not replaced by zero; CRSP nonmissing duration returns are compounded.
+Panel B candidates: 2,008,380; valid signals by J: J3=506,306, J6=494,237, J9=482,365, J12=470,681.
+Panel A valid signals by J: J3=511,566, J6=498,789, J9=486,328, J12=474,104.
+
+HOLDING RETURNS AND DELISTINGS
+Holding returns come from the unfiltered monthly lookup after formation eligibility is fixed. This retains subsequent returns when a stock changes exchange/classification and avoids a future-survival screen.
+Complete delisting-adjusted monthly returns are preserved. Missing returns and G/M incomplete delisting returns are never set to zero; the affected cohort leg is reweighted across usable members. A completely empty cohort leg stops execution.
+Across all 32 strategy calculations, unavailable constituent slots were: no monthly record=949,759, missing monthly return=45,279, incomplete G/M delisting return=15,377. These counts include repeated appearances of a stock across cohorts and strategies.
+Usable holding slots: 21,025,100/22,035,515 (95.41%); the unavailable count reconciles exactly to the three reasons above.
+
+MODERN WML MEANS (MONTHLY PERCENT)
+Panel A
+J\K       3       6       9      12
+  3   0.336   0.479   0.502   0.395
+  6   0.627   0.659   0.585   0.416
+  9   0.818   0.685   0.525   0.349
+ 12   0.455   0.372   0.277   0.148
+
+Panel B
+J\K       3       6       9      12
+  3   0.491   0.546   0.559   0.430
+  6   0.740   0.726   0.622   0.440
+  9   0.879   0.687   0.537   0.367
+ 12   0.580   0.432   0.310   0.163
+
+SELECTED 6/6 RESULTS
+Panel A WML: mean=0.6591%, t=1.5064; original mean=0.9500%, t=3.07.
+Panel B WML: mean=0.7256%, t=1.6795; original mean=1.1000%, t=3.61.
+
+INFERENCE
+All reported t-statistics use mean / (sample standard deviation with ddof=1 / sqrt(T)). No HAC correction is applied. Overlapping portfolios can produce serial dependence; a HAC estimate belongs in a separately labelled robustness analysis.
+
+VALIDATION
+Synthetic checks passed for compounding, decile ordering, missing holding returns, and market-date boundaries.
+Actual-data checks passed for duplicate conflicts, Stage 2 dimensions and keys, date coverage, P1/P10 ordering, balanced deciles, exact J-window timing, no look-ahead, K active cohorts, common sample months, equal weighting, and WML=P10-P1.
+Summary rows: 96; monthly strategy rows: 9216.
+
+OUTPUTS
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/table1_replication.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/table1_monthly_returns.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/logs/table1_replication_report.txt
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/processed/table1_monthly_return_lookup.parquet
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/processed/table1_daily_cumulative.parquet

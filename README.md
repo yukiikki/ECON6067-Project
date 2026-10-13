@@ -1,9 +1,8 @@
 # ECON6067: Jegadeesh and Titman momentum replication
 
-Current milestone: **Table I, Panel A, J=6/K=6 completed**. The approved
-NYSE/NYSE American common-stock panel and the first no-skip momentum strategy
-have been prepared and validated. Other J/K strategies and Tables II-III have
-not been implemented.
+Current milestone: **Table I completed**. All 32 combinations in Panels A and B
+have been constructed and validated for the modern sample. Tables II and III
+have not been implemented.
 
 ## Inputs and access
 
@@ -12,9 +11,10 @@ packages 02 and 03 into this project directory, preserving their original names.
 Read their README and DATA_DICTIONARY files. Restricted data are not distributed
 by this repository. Do not upload raw data to public GitHub.
 
-The Stage 1 and Stage 2 scripts read only:
-`02_Monthly_Stocks_and_Factors/data/monthly_stock.csv`.
-They leave this file unchanged. The daily CSV is not processed at this stage.
+The Stage 1 and Stage 2 scripts read only
+`02_Monthly_Stocks_and_Factors/data/monthly_stock.csv`. Stage 4 also reads
+`03_Daily_Stocks/data/daily_stock.csv` for Panel B. All raw inputs remain
+unchanged.
 
 ## Run in VS Code
 
@@ -34,9 +34,10 @@ or newer is required. Then run each completed stage from the project root:
 python src/01_data_inspection.py
 python src/02_data_preparation.py
 python src/03_momentum_j6_k6.py
+python src/04_table1_replication.py
 ```
 
-Both scripts resolve default paths from their own locations.
+All scripts resolve default paths from their own locations.
 
 The 1.2 GB CSV is streamed in records and inserted into temporary SQLite storage
 in batches of 50,000. Exact duplicate checks cover the whole file, including
@@ -95,6 +96,36 @@ holding returns are never replaced by zero. Cohort membership remains fixed,
 and each cohort is rebalanced equally among members with usable returns in that
 month. The report counts every unavailable constituent slot and records the
 tie-breaking, delisting and standard-error assumptions.
+
+This first 6/6 implementation is retained as a transparent development step.
+The full Table I results below supersede its preliminary estimates because all
+32 strategies use one common evaluation period and an unfiltered return lookup
+after formation-date eligibility is fixed.
+
+## Stage 4: complete Table I
+
+Run the complete replication with:
+
+```sh
+python src/04_table1_replication.py
+```
+
+DuckDB scans the 26 GB daily CSV without loading it into memory. The script
+validates and atomically rebuilds two compact processed return layers, then
+constructs all J/K combinations for `J,K = 3,6,9,12`:
+
+- `processed/table1_monthly_return_lookup.parquet`
+- `processed/table1_daily_cumulative.parquet`
+- `outputs/tables/table1_replication.csv`
+- `outputs/tables/table1_monthly_returns.csv`
+- `outputs/logs/table1_replication_report.txt`
+
+Panel A uses contiguous formation and holding periods. Panel B ends the daily
+formation-return window seven calendar days before the first trading day of the
+holding month. The paper says to skip one week but does not state whether that
+means five trading days or seven calendar days, so this is an explicit,
+reviewable implementation assumption. Every strategy uses the same modern
+evaluation period, January 2002 through December 2025.
 
 ## Audit definitions and limits
 
