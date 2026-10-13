@@ -1,0 +1,56 @@
+TABLE II REPLICATION REPORT
+
+STATUS
+Completed the modern-sample replication of Jegadeesh and Titman (1993) Table II.
+Strategy: J=6, K=6, no skip week (Table I Panel A convention).
+Evaluation period: 200201-202512 (288 months).
+
+PAPER-STATED METHOD
+Stocks are ranked on six-month lagged returns into ten equal-weight deciles and held for six months. Table II reports post-ranking betas relative to the value-weighted index and average market capitalization. The original sample is January 1965-December 1989.
+
+IMPLEMENTATION ASSUMPTIONS REQUIRING METHODOLOGICAL REVIEW
+1. The paper does not specify the beta regression equation for Table II. This implementation estimates R_pt = alpha_p + beta_p*R_mt + error using monthly total returns and an intercept. R_mt is the supplied CRSP value-weighted return including distributions. No risk-free rate is subtracted.
+2. The paper does not specify the market-cap measurement date or averaging order. This implementation uses end-of-formation-month MthCap, equal weights stocks within each cohort-decile, then equal weights formation cohorts. MthCap is converted from thousands of dollars to millions of dollars.
+3. Exact formation-return ties are broken by ascending PERMNO. The original paper does not state a tie rule.
+4. The modern evaluation period is kept identical to the validated Table I common period so Table I and Table II describe the same return sample.
+
+RESULTS
+Portfolio  Modern beta  Average cap ($m)  Original beta  Original cap ($m)
+     P1       1.8888       1798.653788           1.36             208.24
+     P2       1.4826       5437.987864           1.19             480.07
+     P3       1.3109       9264.863736           1.14             545.31
+     P4       1.1945      11260.870993           1.11             618.85
+     P5       1.1040      12631.990696           1.09             692.89
+     P6       1.0440      13652.207336           1.08             702.51
+     P7       1.0101      14181.594230           1.09             738.09
+     P8       1.0458      13323.420853           1.12             758.87
+     P9       1.0878      11316.970345           1.17             680.18
+    P10       1.2550       5642.335490           1.28             495.13
+ P10-P1      -0.6337                            -0.08                   
+
+DATA AND PORTFOLIO CONSTRUCTION
+Stage 2 input: 520,438 rows, 4,669 stocks, 312 months; unique PERMNO-month keys confirmed.
+Unfiltered holding-return lookup: 612,239 stock-months.
+Valid J=6 stock-formation signals: 498,789; rejected for missing formation month: 20,505; rejected for unusable formation return: 1,144.
+Formation cohorts available: 307; exact tie groups: 1.
+Market-cap cohorts used: 200107-202511.
+Usable formation caps: 469,711/469,711 (100.00%); missing or nonpositive caps affect only the descriptive cap statistic.
+Market-cap scale check: MthCap equaled abs(MthPrc)*ShrOut within 4.23e-07 in 1,000 deterministic source rows. Because the supplied dictionary defines ShrOut in thousands, MthCap is treated as thousands of dollars.
+Holding-component exclusions under the unchanged Table I convention: 39,345. Missing returns are not set to zero; each affected cohort-decile is reweighted over its usable members. Complete delisting-adjusted returns remain included.
+
+VALIDATION
+PASS - synthetic decile, equal-weight return, missing-return, and known-beta tests.
+PASS - all ten deciles are exhaustive, mutually exclusive, ordered by signal, and differ in size by at most one stock in every formation cohort.
+PASS - every reported month contains six active cohorts aged one through six months; no future return enters formation.
+PASS - supplied vwretd is unique within every month and available in all 288 evaluation months.
+PASS - reconstructed P1 and P10 returns match validated Table I monthly returns; maximum absolute differences are 0.000e+00 and 0.000e+00.
+PASS - monthly P10-P1 equals P10 minus P1, and its OLS beta equals beta(P10)-beta(P1) within 1e-12.
+PASS - all inputs and existing Table I outputs were unchanged during execution.
+
+INTERPRETATION LIMITS
+Modern capitalization is nominal and is not directly comparable to the paper's 1965-1989 dollar values without an explicit inflation adjustment. Table II does not report beta standard errors, and this replication follows that presentation. The beta and market-cap timing assumptions above should be approved before Table II is treated as methodologically final.
+
+OUTPUTS
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/table2_replication.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/table2_monthly_portfolios.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/logs/table2_replication_report.txt
