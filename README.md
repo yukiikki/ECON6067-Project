@@ -71,7 +71,7 @@ ECON6067_Project/
 ├── 02_Monthly_Stocks_and_Factors/   # supplied monthly package
 ├── 03_Daily_Stocks/                 # supplied daily package
 ├── external_data/                   # French Mom source snapshot
-├── reference/                       # paper used for methodology
+├── references/                      # local paper; PDFs are not tracked
 ├── src/
 │   ├── 01_data_inspection.py
 │   ├── 02_data_preparation.py

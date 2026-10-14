@@ -55,8 +55,8 @@ data/raw/*
 !data/raw/.gitkeep
 data/intermediate/
 
-# Reference PDFs if you store them locally
-references/
+# Reference PDFs are kept locally; cite them in README instead of redistributing.
+/references/*.pdf
 # Restricted supplied packages and generated processed data
 /02_Monthly_Stocks_and_Factors/data/
 /03_Daily_Stocks/data/
