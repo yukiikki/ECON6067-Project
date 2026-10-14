@@ -1,0 +1,5 @@
+term_or_statistic,estimate,units,standard_error,t_statistic,p_value
+alpha,0.0047631520,decimal monthly return,0.0025016245,1.904024,0.05791058329
+beta,1.3602939305,factor loading,0.0558746499,24.345458,1.119942461e-71
+r_squared,0.6745196630,fraction,,,
+residual_standard_deviation,0.0424348507,decimal monthly return,,,

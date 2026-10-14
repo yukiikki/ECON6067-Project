@@ -1,0 +1,46 @@
+INDEPENDENT EXTENSION: REPLICATED WML VERSUS KENNETH FRENCH MOM
+
+STATUS
+Completed the local-file comparison using Table I Panel A, J=6, K=6 WML.
+Common sample: 200201-202512 (288 months).
+
+FRENCH FILE PARSING
+Source: /Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/external_data/F-F_Momentum_Factor 2.csv
+Only rows with an exact six-digit YYYYMM first field were retained. Prose, headers, blank rows, and four-digit annual factors were ignored.
+Monthly observations found: 1,196, spanning 192701-202608.
+French missing markers (-99.99, -999, and -999.99) were converted to NaN before merging. Missing monthly rows in the full French series: 0; missing rows in the 2002-2025 common sample: 0.
+French Mom was converted from percent to decimal by dividing by 100. Table I returns were already decimals.
+
+DESCRIPTIVE STATISTICS
+                              Replicated WML      French Mom
+Mean monthly return                 0.6591%          0.1344%
+Monthly standard deviation          7.4251%          4.4830%
+Mean t-statistic                    1.5064           0.5087
+Positive-month fraction             66.67%           56.94%
+Final cumulative return             167.50%            7.86%
+
+CORRELATION AND OLS
+Pearson monthly-return correlation: 0.821291.
+Regression: replicated_WML_t = alpha + beta*French_Mom_t + error_t.
+Alpha: 0.4763% per month; t=1.9040; two-sided p=0.0579.
+Beta on French Mom: 1.360294; t=24.3455; two-sided p=1.12e-71.
+R-squared: 67.4520%.
+
+ECONOMIC INTERPRETATION
+The correlation and beta measure how much the locally replicated 6/6 WML strategy moves with French Mom. They are not expected to equal one because French Mom uses prior returns from months -12 to -2, value-weighted portfolios, NYSE breakpoints, and NYSE/AMEX/NASDAQ stocks, whereas the replication uses six-month formation returns, equal weights, NYSE/NYSE American stocks, and six overlapping holding cohorts.
+The regression alpha is the average component of replicated WML not explained by contemporaneous French Mom exposure. It is not a CAPM alpha and does not by itself establish a distinct anomaly. Conventional OLS standard errors are reported for a transparent baseline; serial dependence from overlapping six-month cohorts remains a limitation.
+
+VALIDATION
+PASS - exactly 288 consecutive common months from January 2002 through December 2025.
+PASS - French percentage-to-decimal conversion was checked by round trip to the source values.
+PASS - Table I WML equals P10 minus P1 in every selected month.
+PASS - simple-regression R-squared equals squared Pearson correlation within 1e-12.
+PASS - cumulative series use monthly compounding and begin from one dollar of notional wealth.
+PASS - the French source CSV and all Table I-III results were unchanged.
+
+OUTPUTS
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/independent_extension_descriptive.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/independent_extension_regression.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/tables/independent_extension_monthly.csv
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/figures/independent_extension_cumulative_returns.svg
+/Users/erbadamac/Desktop/fode/ECON6067/ECON6067_Project/outputs/logs/independent_extension_report.txt
