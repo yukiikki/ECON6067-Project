@@ -1,172 +1,279 @@
-# ECON6067: Jegadeesh and Titman momentum replication
+# ECON6067: Jegadeesh and Titman (1993) momentum replication
 
-Current milestone: **Table I completed**. All 32 combinations in Panels A and B
-have been constructed and validated for the modern sample. Tables II and III
-have not been implemented.
+This repository reproduces Tables I-III of Jegadeesh and Titman (1993),
+*Returns to Buying Winners and Selling Losers: Implications for Stock Market
+Efficiency*, using the supplied modern CRSP sample. It also compares the
+replicated six-month formation/six-month holding winner-minus-loser return with
+the Kenneth French monthly Momentum Factor.
 
-## Inputs and access
+The empirical analysis is complete. The numerical results cover January 2002
+through December 2025 and should not be expected to match the paper's
+January 1965-December 1989 estimates.
 
-Obtain the course data through the authorized course distribution and extract
-packages 02 and 03 into this project directory, preserving their original names.
-Read their README and DATA_DICTIONARY files. Restricted data are not distributed
-by this repository. Do not upload raw data to public GitHub.
+## Research outputs
 
-The Stage 1 and Stage 2 scripts read only
-`02_Monthly_Stocks_and_Factors/data/monthly_stock.csv`. Stage 4 also reads
-`03_Daily_Stocks/data/daily_stock.csv` for Panel B. All raw inputs remain
-unchanged.
+- **Table I:** all 32 combinations of formation and holding periods
+  `J,K = 3,6,9,12`, for the no-skip and one-week-gap panels.
+- **Table II:** post-ranking market betas and average market capitalization for
+  the no-skip `J=6, K=6` deciles.
+- **Table III:** size- and ex-ante-beta-sorted `J=6, K=6` portfolios, including
+  raw returns, CAPM alphas, and joint tests.
+- **Independent Extension:** descriptive statistics, correlation, OLS
+  regression, and cumulative returns for replicated 6/6 WML versus French Mom.
 
-## Run in VS Code
+Detailed implementation assumptions and validation evidence are recorded in
+`outputs/logs/`. The code does not force the modern results to equal the
+original paper.
 
-Open this project folder in VS Code, open Terminal > New Terminal, and set up
-the project environment once:
+## Data access and required files
+
+The CRSP-derived course files are restricted and are not distributed through
+this public repository. Obtain packages 02 and 03 through the authorized
+ECON6067 course distribution, extract them at the project root, and preserve
+the supplied folder names and filenames:
+
+```text
+02_Monthly_Stocks_and_Factors/
+├── README.md
+├── DATA_DICTIONARY.md
+└── data/
+    ├── monthly_stock.csv
+    └── F-F factors and RF.csv
+
+03_Daily_Stocks/
+├── README.md
+├── DATA_DICTIONARY.md
+└── data/
+    └── daily_stock.csv
+```
+
+The monthly package is approximately 1.2 GB and the daily CSV is approximately
+28 GB after extraction. Allow at least 40 GB of free disk space for the course
+archives, extracted files, processed caches, and DuckDB temporary work.
+
+The Independent Extension reads
+`external_data/F-F_Momentum_Factor 2.csv`, a local snapshot of the Kenneth
+French monthly Momentum Factor. The source file contains explanatory text,
+monthly observations, and annual observations. The script extracts only exact
+six-digit `YYYYMM` rows, converts percent returns to decimals, and handles the
+documented missing markers. The official source is the Kenneth French Data
+Library, “Momentum Factor (Mom)” monthly CSV:
+
+<https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Momentum_Factor_CSV.zip>
+
+Do not alter any source CSV manually. The workflow verifies that research
+inputs remain unchanged during execution.
+
+## Project structure
+
+```text
+ECON6067_Project/
+├── 02_Monthly_Stocks_and_Factors/   # supplied monthly package
+├── 03_Daily_Stocks/                 # supplied daily package
+├── external_data/                   # French Mom source snapshot
+├── reference/                       # paper used for methodology
+├── src/
+│   ├── 01_data_inspection.py
+│   ├── 02_data_preparation.py
+│   ├── 03_momentum_j6_k6.py         # preliminary development result
+│   ├── 04_table1_replication.py
+│   ├── 05_table2_replication.py
+│   ├── 06_table3_replication.py
+│   ├── 07_extension.py
+│   └── validation/
+│       └── validate_table1.py
+├── processed/                       # regenerated intermediates; Git-ignored
+├── outputs/
+│   ├── tables/                      # final and supporting CSV results
+│   ├── figures/                     # final figures
+│   └── logs/                        # audit and validation reports
+├── run_all.py                       # main reproducibility workflow
+├── requirements.txt
+├── README.md
+└── .gitignore
+```
+
+All scripts derive the project root from their own file location with
+`pathlib`. Running them does not require an absolute path or editing source
+code.
+
+## Environment setup
+
+Python 3.10 or newer is required. The project was last tested with Python 3.13
+and the exact package versions in `requirements.txt`.
+
+From the project root on macOS or Linux:
 
 ```sh
 python3 -m venv .venv
 source .venv/bin/activate
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`. Python 3.10
-or newer is required. Then run each completed stage from the project root:
+On Windows PowerShell:
 
-```sh
-python src/01_data_inspection.py
-python src/02_data_preparation.py
-python src/03_momentum_j6_k6.py
-python src/04_table1_replication.py
+```powershell
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
-All scripts resolve default paths from their own locations.
+Only `duckdb` and `pyarrow` are third-party runtime dependencies. Remaining
+imports use the Python standard library. The cumulative-return figure is
+written directly as SVG, so Matplotlib is not required.
 
-The 1.2 GB CSV is streamed in records and inserted into temporary SQLite storage
-in batches of 50,000. Exact duplicate checks cover the whole file, including
-batch boundaries. Exact percentiles use disk-backed SQL indexes. Allow temporary
-disk space for the database and indexes; runtime depends on the machine.
-Stock identifiers and distinct stock/month sets are retained in memory, not the
-full dataset. Temporary files are removed automatically after the audit.
+## Reproduce the complete analysis
 
-## Inspection output
-
-The script generates one file: `outputs/logs/inspection_report.txt`.
-It contains dimensions, date coverage, duplicate and quality-flag counts,
-all column types and missingness, descriptive statistics, classification counts,
-and the complete monthly stock-count series. Console output is limited to
-progress and a short summary. No separate CSV, JSON or console log is needed.
-Rerunning replaces this report; it does not modify raw data.
-
-## Stage 2 sample construction
-
-The approved build is run with:
+First verify that the environment, scripts, and four required input files are
+available:
 
 ```sh
-python src/02_data_preparation.py
+python run_all.py --check
 ```
 
-The script streams the raw CSV, validates and resolves duplicates, applies the
-approved exchange/common-stock rules, and creates:
+This preflight does not run an analysis or rewrite an output.
+
+Run the formal reproducibility workflow with:
+
+```sh
+python run_all.py
+```
+
+The default sequence is:
+
+1. data inspection;
+2. sample construction;
+3. complete Table I;
+4. Table II;
+5. Table III;
+6. Independent Extension.
+
+The process stops immediately if a stage fails or an expected output is
+missing. It uses the active Python interpreter and sets the working directory
+to the project root for every stage.
+
+The following checks are retained as optional work because they repeat parts of
+the main pipeline:
+
+```sh
+# Include the preliminary standalone Panel A J=6/K=6 development result
+python run_all.py --include-development-j6k6
+
+# Include the independent Table I validation
+python run_all.py --include-table1-validation
+
+# Include both
+python run_all.py --include-development-j6k6 --include-table1-validation
+```
+
+The full workflow scans the approximately 28 GB daily file when rebuilding
+Table I. Runtime depends on disk speed and available memory. A check-only run is
+the appropriate routine test when the empirical outputs have already been
+validated.
+
+## Main expected outputs
+
+### Processed intermediates
+
+These files are generated locally and excluded from Git because they are
+reproducible and can be large:
 
 - `processed/monthly_stock_prepared.parquet`
-- `outputs/logs/sample_construction_report.txt`
-
-The Parquet output has 520,438 unique stock-months, 4,669 PERMNOs and 312
-months. Missing and extreme observations are preserved with explicit usability
-flags. Rerunning atomically replaces the generated dataset after all validation
-checks pass. It does not calculate portfolio returns.
-
-## Stage 3: Table I, Panel A, J=6/K=6
-
-Run the first portfolio strategy with:
-
-```sh
-python src/03_momentum_j6_k6.py
-```
-
-The script first runs small synthetic tests, validates the Stage 2 dimensions
-and keys, and then forms monthly equal-weighted deciles from consecutive,
-usable six-month return histories. Formation month `t` uses months `t-5`
-through `t`; holding begins in `t+1`. It creates:
-
-- `outputs/tables/table1_panel_a_j6_k6.csv`
-- `outputs/tables/table1_panel_a_j6_k6_monthly.csv`
-- `outputs/logs/momentum_j6_k6_report.txt`
-
-The reported series uses only months with all six overlapping cohorts. Missing
-holding returns are never replaced by zero. Cohort membership remains fixed,
-and each cohort is rebalanced equally among members with usable returns in that
-month. The report counts every unavailable constituent slot and records the
-tie-breaking, delisting and standard-error assumptions.
-
-This first 6/6 implementation is retained as a transparent development step.
-The full Table I results below supersede its preliminary estimates because all
-32 strategies use one common evaluation period and an unfiltered return lookup
-after formation-date eligibility is fixed.
-
-## Stage 4: complete Table I
-
-Run the complete replication with:
-
-```sh
-python src/04_table1_replication.py
-```
-
-DuckDB scans the 26 GB daily CSV without loading it into memory. The script
-validates and atomically rebuilds two compact processed return layers, then
-constructs all J/K combinations for `J,K = 3,6,9,12`:
-
 - `processed/table1_monthly_return_lookup.parquet`
 - `processed/table1_daily_cumulative.parquet`
+- `processed/table3_daily_market.parquet`
+- `processed/table3_scholes_williams_betas.parquet`
+
+### Tables and monthly series
+
 - `outputs/tables/table1_replication.csv`
 - `outputs/tables/table1_monthly_returns.csv`
+- `outputs/tables/table2_replication.csv`
+- `outputs/tables/table2_monthly_portfolios.csv`
+- `outputs/tables/table3_replication.csv`
+- `outputs/tables/table3_monthly_portfolios.csv`
+- `outputs/tables/independent_extension_descriptive.csv`
+- `outputs/tables/independent_extension_regression.csv`
+- `outputs/tables/independent_extension_monthly.csv`
+
+### Figure
+
+- `outputs/figures/independent_extension_cumulative_returns.svg`
+
+### Audit and validation reports
+
+- `outputs/logs/inspection_report.txt`
+- `outputs/logs/sample_construction_report.txt`
 - `outputs/logs/table1_replication_report.txt`
+- `outputs/logs/table1_validation.md`
+- `outputs/logs/table2_replication_report.txt`
+- `outputs/logs/table3_replication_report.txt`
+- `outputs/logs/independent_extension_report.txt`
 
-Panel A uses contiguous formation and holding periods. Panel B ends the daily
-formation-return window seven calendar days before the first trading day of the
-holding month. The paper says to skip one week but does not state whether that
-means five trading days or seven calendar days, so this is an explicit,
-reviewable implementation assumption. Every strategy uses the same modern
-evaluation period, January 2002 through December 2025.
+The two `table1_panel_a_j6_k6` CSVs and
+`momentum_j6_k6_report.txt` document the preliminary development stage.
+The complete Table I outputs supersede them for the reported replication.
 
-## Audit definitions and limits
+## Core sample and implementation choices
 
-CSV has no intrinsic data types. The audit reports full-file counts of
-integer-like, float-like and text tokens, preserving leading-zero identifiers
-in duplicate checks. Missing means blank/whitespace-only. Nonblank special
-missing codes are not silently mapped; nonnumeric/nonfinite MthRet/MthCap values
-are flagged separately. Confirm source missing-code semantics before cleaning.
+The Stage 2 sample applies the approved CRSP CIZ common-stock criteria:
 
-For monthly coverage only, a valid return is finite numeric and at least -1,
-with a nonblank stock identifier and a parseable date. This is an audit definition,
-not final research eligibility. Descriptive statistics include all finite values,
-even flagged returns below -1 or nonpositive capitalization. No rows are dropped,
-returns imputed, or outliers altered. Duplicate totals exclude missing keys;
-missing identifiers/dates are separately flagged. Issue counts cover all rows
-and may overlap. No observation-level example or duplicate files are exported.
+- `PrimaryExch` in `N` or `A`;
+- `SecurityType=EQTY`;
+- `SecuritySubType=COM`;
+- `ShareType=NS`;
+- `USIncFlg=Y`;
+- `IssuerType` in `ACOR` or `CORP`.
 
-Formation histories and holding-period eligibility remain portfolio-stage
-checks. Six observations with incomplete delisting-return flags are retained
-and require an explicit portfolio-stage decision.
+The prepared panel contains 520,438 unique stock-month observations, 4,669
+PERMNOs, and 312 months. Missing returns, valid extreme returns, delisting
+observations, and missing or nonpositive capitalization are preserved with
+explicit usability rules rather than globally dropped or imputed.
 
-## Findings and validation from the initial inspection
+Table I uses equal-weight momentum deciles and overlapping holding cohorts.
+Panel B implements the paper's one-week gap as seven calendar days, an explicit
+assumption because the paper does not specify five trading days versus seven
+calendar days. Table II and Table III assumptions, including beta equations,
+capitalization timing, Scholes-Williams requirements, and inference conventions,
+are stated in their individual reports.
 
-The supplied file covers January 2000–December 2025, so it cannot reproduce
-results for the original 1965–1989 evaluation period. A modern-period 6/6
-investigation requires an explicitly documented sample-period deviation or
-additional historical data. The actual file contains exchange/security fields,
-contrary to the initial four-field description, and includes ETFs and closed-end
-funds. Stage 2 restricts it to the approved CRSP CIZ equivalent of legacy share
-codes 10 and 11 on NYSE or NYSE American.
+The main tables use conventional time-series or OLS standard errors as
+documented in the scripts and reports. Overlapping portfolios can produce
+serial dependence, so conventional significance statistics should be
+interpreted with that limitation.
 
-All 22,447 duplicate groups were checked. Monthly return/capitalization conflicts
-were zero; 20,905 groups were distribution fan-out and 1,542 historical
-classification conflicts were uniquely resolved using effective dates. The
-processed output has no duplicate PERMNO-month keys.
+## Git and data-protection rules
 
-AI assisted with the inspection code and documentation. Initial verification
-included syntax compilation and a diagnostic fixture covering duplicates, dates,
-missing/nonnumeric fields, the -100% boundary, capitalization, monthly distinct
-stocks and exact percentiles. Full-file monthly and duplicate totals reconciled.
-The Stage 2 run also confirmed the raw file was unchanged using SHA-256.
-The original-period feasibility expectation and the assumption of no monthly
-exchange fields were corrected using actual data. Formal AI-use reporting will
-be developed with the research report.
+The repository tracks source code, documentation, concise logs, final tables,
+the extension figure, and the small French Mom source snapshot. It excludes:
+
+- the restricted course CSVs under both numbered packages;
+- all generated `processed/` Parquet files;
+- virtual environments and Python caches;
+- DuckDB, SQLite, coverage, editor, and operating-system temporary files.
+
+Before making a public repository, verify that the reference-paper PDF may be
+redistributed. If redistribution is not permitted, keep the citation in the
+README and remove only the PDF from Git tracking while retaining a local copy.
+
+Do not use `git add -f` to override the raw-data exclusions. Review staged
+files with `git status` and `git diff --cached --stat` before every push.
+
+## Reproducibility limits
+
+- The supplied data begin in 2000, so the original 1965-1989 sample cannot be
+  reconstructed from these course files.
+- Raw CRSP-derived files cannot be included in a public repository; another
+  authorized user must obtain the same course packages.
+- Generated reports may display machine-specific absolute paths for diagnostic
+  clarity, but all input resolution and computation use repository-relative
+  defaults.
+- The French source snapshot reflects the version downloaded for this project;
+  later versions of the French Data Library may revise historical data.
+- No standalone output currently documents the alternative post-delisting cash
+  treatment or five-trading-day Panel B gap discussed during robustness review.
+  Do not cite those robustness results unless their code and outputs are restored.
+- The final empirical report and AI-use disclosure should describe all approved
+  deviations and how generated code and results were independently checked.

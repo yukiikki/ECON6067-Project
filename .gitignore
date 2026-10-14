@@ -3,6 +3,7 @@
 
 # VS Code
 .vscode/
+.idea/
 
 # Python
 __pycache__/
@@ -19,6 +20,15 @@ env/
 .mypy_cache/
 .ruff_cache/
 .cache/
+.coverage
+htmlcov/
+
+# Local databases and large temporary work files
+*.sqlite
+*.sqlite3
+*.db
+*.duckdb
+.duckdb_tmp/
 
 # Secrets
 .env
@@ -37,6 +47,7 @@ renv/staging/
 *.temp
 *.bak
 *~
+*.swp
 
 # Raw / intermediate data
 data/raw/*
@@ -49,4 +60,6 @@ references/
 # Restricted supplied packages and generated processed data
 /02_Monthly_Stocks_and_Factors/data/
 /03_Daily_Stocks/data/
+/02_Monthly_Stocks_and_Factors*.zip
+/03_Daily_Stocks*.zip
 /processed/
